@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Força no Joelho</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & VARS ─────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0d1117; --surface:#161b22; --card:#1c2330; --border:#30363d;
+  --accent:#00e5a0; --accent2:#00b4d8; --warn:#ff6b35; --done:#238636;
+  --text:#e6edf3; --muted:#8b949e;
+  --light:#f2c4ce; --medium:#b8a0d4; --heavy:#9b7fc7; --xheavy:#6b4fa0; --xxheavy:#4a3f60;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,160,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,160,.025) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;}
+
+/* ── NAV ──────────────────────────────────────── */
+.nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(–border);display:flex;}
+.tab{flex:1;padding:14px 6px;border:none;background:transparent;color:var(–muted);font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;letter-spacing:.3px;}
+.tab.on{color:var(–accent);border-bottom-color:var(–accent);}
+.tab:hover{color:var(–text);}
+
+/* ── PAGES ────────────────────────────────────── */
+.page{display:none;max-width:860px;margin:0 auto;padding:20px 16px 80px;position:relative;z-index:1;}
+.page.on{display:block;}
+
+/* ── TYPOGRAPHY ───────────────────────────────── */
+.lbl{font-size:10px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(–accent);margin-bottom:6px;}
+.h1{font-family:‘Bebas Neue’,sans-serif;font-size:clamp(36px,9vw,64px);line-height:.9;margin-bottom:10px;}
+.h1 em{color:var(–accent);font-style:normal;}
+.sub{font-size:13px;color:var(–muted);line-height:1.65;max-width:500px;margin-bottom:12px;}
+.sec{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(–muted);margin:22px 0 10px;padding-left:2px;}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);color:var(–warn);font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;}
+
+/* ── PROGRESS BAR ─────────────────────────────── */
+.progbar{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:14px 18px;margin:16px 0;display:flex;align-items:center;gap:14px;}
+.progbar-txt{font-size:12px;color:var(–muted);white-space:nowrap;}
+.progbar-txt strong{color:var(–accent);font-size:18px;font-weight:700;display:block;line-height:1.1;}
+.track{flex:1;background:var(–border);border-radius:999px;height:7px;overflow:hidden;}
+.fill{height:100%;background:linear-gradient(90deg,var(–accent),var(–accent2));border-radius:999px;transition:width .5s ease;width:0%;}
+
+/* ── PAIN SCALE ───────────────────────────────── */
+.pain-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:18px;}
+.pain-lbl{font-size:11px;color:var(–muted);margin-right:4px;}
+.pn{width:28px;height:28px;border-radius:6px;border:1px solid var(–border);background:var(–surface);color:var(–muted);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;font-family:‘DM Sans’,sans-serif;}
+.pn:hover{border-color:var(–text);color:var(–text);}
+.pn.on{border-color:var(–warn);background:rgba(255,107,53,.15);color:var(–warn);}
+.pain-alert{font-size:12px;color:var(–warn);font-weight:500;display:none;margin-left:6px;}
+.pain-alert.on{display:inline;}
+
+/* ── BAND LEGEND ──────────────────────────────── */
+.bands{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px;}
+.band-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid;}
+.dot{width:8px;height:8px;border-radius:50%;}
+
+/* ── EXERCISE CARD ────────────────────────────── */
+.ex{background:var(–card);border:1px solid var(–border);border-radius:16px;margin-bottom:12px;overflow:hidden;transition:border-color .2s,box-shadow .2s;}
+.ex:hover{border-color:rgba(0,229,160,.2);}
+.ex.done{border-color:rgba(35,134,54,.45);background:rgba(35,134,54,.05);}
+.ex-head{display:flex;align-items:center;gap:12px;padding:15px 16px;cursor:pointer;user-select:none;}
+.ex-num{font-family:‘Bebas Neue’,sans-serif;font-size:26px;color:var(–border);width:32px;text-align:center;flex-shrink:0;transition:color .3s;}
+.ex.done .ex-num{color:var(–done);}
+.ex-info{flex:1;min-width:0;}
+.ex-name{font-size:14px;font-weight:600;color:var(–text);}
+.ex-muscle{font-size:11px;color:var(–accent2);margin-top:2px;}
+.ex-pills{display:flex;gap:7px;flex-shrink:0;}
+.pill{background:var(–surface);border:1px solid var(–border);border-radius:7px;padding:3px 8px;font-size:10px;font-weight:500;color:var(–muted);text-align:center;line-height:1.4;}
+.pill b{display:block;font-size:13px;font-weight:700;color:var(–text);}
+.chev{color:var(–muted);transition:transform .3s;font-size:14px;flex-shrink:0;}
+.ex.open .chev{transform:rotate(180deg);}
+
+/* expand */
+.ex-body{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+.ex.open .ex-body{max-height:1100px;}
+.ex-inner{border-top:1px solid var(–border);padding:16px;}
+
+/* ── ILLUSTRATION ─────────────────────────────── */
+.illus{background:var(–surface);border:1px solid var(–border);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+.illus svg{width:100%;height:auto;display:block;}
+.illus-cap{padding:8px 14px;font-size:11px;color:var(–muted);text-align:center;border-top:1px solid var(–border);background:rgba(0,0,0,.2);}
+
+/* how-to */
+.howto{font-size:13px;color:var(–muted);line-height:1.75;margin-bottom:12px;}
+.howto strong{color:var(–text);}
+.tip{background:rgba(0,180,216,.07);border-left:3px solid var(–accent2);border-radius:0 8px 8px 0;padding:8px 12px;font-size:12px;color:var(–accent2);margin-bottom:14px;line-height:1.5;}
+
+/* band selector */
+.bsel-lbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(–muted);margin-bottom:6px;}
+.bopts{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;}
+.bopt{padding:5px 11px;border-radius:20px;border:1.5px solid var(–border);background:transparent;color:var(–muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;font-family:‘DM Sans’,sans-serif;}
+.bopt.on-light{border-color:var(–light);background:rgba(242,196,206,.12);color:var(–light);}
+.bopt.on-medium{border-color:var(–medium);background:rgba(184,160,212,.12);color:var(–medium);}
+.bopt.on-heavy{border-color:var(–heavy);background:rgba(155,127,199,.12);color:var(–heavy);}
+.bopt.on-xheavy{border-color:#9b6fd4;background:rgba(107,79,160,.12);color:#c4a8ff;}
+.bopt.on-xxheavy{border-color:#777;background:rgba(74,63,96,.2);color:#bbb;}
+
+/* sets */
+.sets-row{display:flex;align-items:center;gap:7px;margin-bottom:12px;flex-wrap:wrap;}
+.sets-lbl{font-size:11px;color:var(–muted);font-weight:500;}
+.sdot{width:32px;height:32px;border-radius:50%;border:2px solid var(–border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(–muted);transition:all .2s;user-select:none;}
+.sdot:hover{border-color:var(–accent);color:var(–accent);}
+.sdot.on{background:var(–accent);border-color:var(–accent);color:#0d1117;}
+
+/* timer */
+.timer-row{display:flex;align-items:center;gap:9px;margin-bottom:14px;}
+.tdisp{font-family:‘Bebas Neue’,sans-serif;font-size:36px;color:var(–accent);letter-spacing:2px;min-width:68px;}
+.tdisp.run{color:var(–warn);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.45}}
+
+/* buttons */
+.btn{padding:9px 15px;border-radius:8px;border:none;cursor:pointer;font-family:‘DM Sans’,sans-serif;font-size:12px;font-weight:600;transition:all .2s;}
+.btn-g{background:var(–surface);color:var(–muted);border:1px solid var(–border);}
+.btn-g:hover{background:var(–border);color:var(–text);}
+.btn-a{background:var(–accent);color:#0d1117;}
+.btn-a:hover{background:#00ffc3;}
+.btn-done{background:var(–done);color:#fff;}
+.btn-done:hover{background:#2ea043;}
+.btn-sm{padding:6px 11px;font-size:11px;}
+.brow{display:flex;gap:7px;flex-wrap:wrap;margin-top:4px;}
+
+/* ── CALENDAR PAGE ────────────────────────────── */
+.cal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.cal-month-lbl{font-family:‘Bebas Neue’,sans-serif;font-size:28px;letter-spacing:1px;}
+.cal-nav{background:var(–surface);border:1px solid var(–border);color:var(–text);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.cal-nav:hover{background:var(–border);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.cdow{text-align:center;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(–muted);padding-bottom:4px;}
+.cday{aspect-ratio:1;border-radius:9px;border:1px solid var(–border);background:var(–surface);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;font-size:12px;font-weight:500;color:var(–muted);position:relative;gap:2px;}
+.cday:hover{border-color:var(–accent2);color:var(–text);}
+.cday.today{border-color:var(–accent2);color:var(–accent2);}
+.cday.empty{background:transparent;border-color:transparent;cursor:default;pointer-events:none;}
+.cday.trained{background:rgba(0,229,160,.1);border-color:var(–accent);color:var(–accent);}
+.cday.pain-hi{background:rgba(255,107,53,.1);border-color:var(–warn);}
+.cdot{width:5px;height:5px;border-radius:50%;}
+
+/* stats grid */
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:9px;margin-top:16px;}
+.sc{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:13px 15px;}
+.sc-icon{font-size:18px;margin-bottom:5px;}
+.sc-lbl{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(–muted);margin-bottom:2px;}
+.sc-val{font-size:16px;font-weight:700;color:var(–text);}
+
+/* log list */
+.log-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(–border);font-size:12px;}
+.log-date{font-weight:700;color:var(–text);min-width:54px;}
+.log-pain{background:rgba(255,255,255,.05);border:1px solid var(–border);padding:2px 7px;border-radius:7px;font-size:11px;}
+.log-note{color:var(–muted);font-style:italic;font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+/* ── MODAL ────────────────────────────────────── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.overlay.on{display:flex;}
+.modal{background:var(–card);border:1px solid var(–border);border-radius:20px;padding:24px;max-width:340px;width:100%;}
+.modal h3{font-family:‘Bebas Neue’,sans-serif;font-size:24px;color:var(–accent);margin-bottom:16px;}
+.mlbl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(–muted);margin-bottom:7px;}
+.mrow{margin-bottom:16px;}
+.yn{display:flex;gap:8px;}
+.ynb{flex:1;padding:9px;border-radius:9px;border:1.5px solid var(–border);background:transparent;color:var(–muted);font-family:‘DM Sans’,sans-serif;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;}
+.ynb.yes{background:rgba(0,229,160,.12);border-color:var(–accent);color:var(–accent);}
+.ynb.no{background:rgba(255,107,53,.1);border-color:var(–warn);color:var(–warn);}
+.mpn{display:flex;gap:4px;flex-wrap:wrap;}
+.mpb{width:27px;height:27px;border-radius:5px;border:1px solid var(–border);background:var(–surface);color:var(–muted);font-size:11px;font-weight:700;cursor:pointer;font-family:‘DM Sans’,sans-serif;transition:all .15s;}
+.mpb.on{border-color:var(–warn);background:rgba(255,107,53,.15);color:var(–warn);}
+.mnote{width:100%;background:var(–surface);border:1px solid var(–border);border-radius:8px;padding:9px;color:var(–text);font-family:‘DM Sans’,sans-serif;font-size:12px;resize:none;outline:none;}
+.mnote:focus{border-color:var(–accent2);}
+.mbtns{display:flex;gap:7px;margin-top:4px;}
+
+/* ── PROGRESSION PAGE ─────────────────────────── */
+.ptable{width:100%;border-collapse:collapse;margin-top:10px;font-size:12px;}
+.ptable th{font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(–muted);text-align:left;padding:7px 10px;border-bottom:1px solid var(–border);}
+.ptable td{padding:9px 10px;border-bottom:1px solid rgba(48,54,61,.4);}
+.ptable tr:hover td{background:rgba(255,255,255,.02);}
+.wk{display:inline-block;background:var(–surface);border:1px solid var(–border);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:600;color:var(–muted);}
+.bt{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:10px;font-size:11px;font-weight:600;border:1.5px solid;}
+.bt-l{border-color:var(–light);color:var(–light);background:rgba(242,196,206,.08);}
+.bt-m{border-color:var(–medium);color:var(–medium);background:rgba(184,160,212,.08);}
+.bt-h{border-color:var(–heavy);color:var(–heavy);background:rgba(155,127,199,.08);}
+.bt-x{border-color:#9b6fd4;color:#c4a8ff;background:rgba(107,79,160,.08);}
+.bt-xx{border-color:#777;color:#bbb;background:rgba(74,63,96,.15);}
+.pnote{font-size:12px;color:var(–muted);background:rgba(0,229,160,.04);border:1px solid rgba(0,229,160,.12);border-radius:10px;padding:13px 15px;margin-top:14px;line-height:1.65;}
+
+/* ── FINISH BOX ───────────────────────────────── */
+.finish{background:var(–surface);border:1px solid var(–border);border-radius:14px;padding:22px;text-align:center;margin-top:12px;}
+.finish-h{font-family:‘Bebas Neue’,sans-serif;font-size:30px;color:var(–accent);margin-bottom:5px;}
+.cooldown{list-style:none;text-align:left;max-width:320px;margin:0 auto 16px;}
+.cooldown li{padding:6px 0;border-bottom:1px solid var(–border);font-size:12px;color:var(–muted);display:flex;align-items:center;gap:7px;}
+.cooldown li::before{content:’›’;color:var(–accent);font-size:14px;font-weight:700;}
+#completeMsg{display:none;}
+.complete-title{font-family:‘Bebas Neue’,sans-serif;font-size:40px;color:var(–accent);}
+
+/* confetti */
+.cdot-fx{position:fixed;width:7px;height:7px;border-radius:50%;animation:fall 2.5s ease-in forwards;pointer-events:none;z-index:9999;}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:0}}
+
+@media(max-width:540px){.ex-pills{display:none}.sgrid{grid-template-columns:1fr 1fr}}
+</style>
+
+</head>
+<body>
+
+<!-- NAV -->
+
+<nav class="nav">
+  <button class="tab on" onclick="goPage('treino',this)">🏋️ Treino</button>
+  <button class="tab" onclick="goPage('calendario',this)">📅 Calendário</button>
+  <button class="tab" onclick="goPage('progressao',this)">📈 Progressão</button>
+</nav>
+
+<!-- ══════════════ PAGE: TREINO ══════════════ -->
+
+<div id="pg-treino" class="page on">
+  <div style="padding-top:8px">
+    <div class="lbl">Fisioterapia · Joelho · Fokky Bands</div>
+    <h1 class="h1">FORÇA<br><em>NO JOELHO</em></h1>
+    <p class="sub">Programa personalizado de fortalecimento muscular. Glúteos, quadríceps e estabilizadores do joelho.</p>
+    <div class="badge">⚠️ Pare se a dor passar de 6/10</div>
+  </div>
+
+  <!-- Pain scale -->
+
+  <div class="sec">Como está a dor agora?</div>
+  <div class="pain-row">
+    <span class="pain-lbl">0 = sem dor · 10 = máxima:</span>
+    <button class="pn" data-v="0" onclick="selPain(this)">0</button>
+    <button class="pn" data-v="1" onclick="selPain(this)">1</button>
+    <button class="pn" data-v="2" onclick="selPain(this)">2</button>
+    <button class="pn" data-v="3" onclick="selPain(this)">3</button>
+    <button class="pn" data-v="4" onclick="selPain(this)">4</button>
+    <button class="pn" data-v="5" onclick="selPain(this)">5</button>
+    <button class="pn" data-v="6" onclick="selPain(this)">6</button>
+    <button class="pn" data-v="7" onclick="selPain(this)">7</button>
+    <button class="pn" data-v="8" onclick="selPain(this)">8</button>
+    <button class="pn" data-v="9" onclick="selPain(this)">9</button>
+    <button class="pn" data-v="10" onclick="selPain(this)">10</button>
+    <span class="pain-alert" id="painAlert">⚠️ Não treine hoje!</span>
+  </div>
+
+  <!-- Band legend -->
+
+  <div class="sec">Suas bandas Fokky</div>
+  <div class="bands">
+    <div class="band-chip" style="border-color:var(--light);color:var(--light);background:rgba(242,196,206,.1)"><div class="dot" style="background:var(--light)"></div>Light</div>
+    <div class="band-chip" style="border-color:var(--medium);color:var(--medium);background:rgba(184,160,212,.1)"><div class="dot" style="background:var(--medium)"></div>Medium</div>
+    <div class="band-chip" style="border-color:var(--heavy);color:var(--heavy);background:rgba(155,127,199,.1)"><div class="dot" style="background:var(--heavy)"></div>Heavy</div>
+    <div class="band-chip" style="border-color:#9b6fd4;color:#c4a8ff;background:rgba(107,79,160,.1)"><div class="dot" style="background:var(--xheavy)"></div>X-Heavy</div>
+    <div class="band-chip" style="border-color:#777;color:#bbb;background:rgba(74,63,96,.2)"><div class="dot" style="background:#555"></div>XX-Heavy</div>
+  </div>
+
+  <!-- Progress -->
+
+  <div class="progbar">
+    <div class="progbar-txt"><strong id="pPct">0%</strong>concluído</div>
+    <div class="track"><div class="fill" id="pBar"></div></div>
+    <div class="progbar-txt" style="text-align:right"><strong id="pCount">0/6</strong>exercícios</div>
+  </div>
+
+  <!-- ── WARMUP ── -->
+
+  <div class="sec">🔥 Aquecimento</div>
+
+  <div class="ex" id="ex-0">
+    <div class="ex-head" onclick="toggle(0)">
+      <div class="ex-num">0</div>
+      <div class="ex-info">
+        <div class="ex-name">Aquecimento Ativo</div>
+        <div class="ex-muscle">Ativação geral · Preparação articular</div>
+      </div>
+      <div class="ex-pills"><div class="pill">Tempo<b>5 min</b></div></div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="ex-body"><div class="ex-inner">
+
+```
+  <div class="illus">
+    <svg viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" style="background:#161b22">
+      <!-- Figure 1: marcha parada -->
+      <circle cx="100" cy="45" r="18" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="100" y1="63" x2="100" y2="130" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="100" y1="80" x2="75" y2="100" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="100" y1="80" x2="125" y2="100" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- leg up -->
+      <line x1="100" y1="130" x2="80" y2="170" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="100" y1="130" x2="120" y2="155" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="120" y1="155" x2="120" y2="185" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- knee raised arrow -->
+      <path d="M140 148 L160 130" stroke="#ffd166" stroke-width="2" fill="none"/>
+      <polygon points="160,130 150,132 155,142" fill="#ffd166"/>
+      <text x="165" y="128" fill="#ffd166" font-size="11" font-family="DM Sans,sans-serif">Joelho alto</text>
+      <text x="62" y="210" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Marcha parada</text>
+      <text x="62" y="222" fill="#8b949e" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">2 minutos</text>
+
+      <!-- Figure 2: circles hip -->
+      <circle cx="330" cy="45" r="18" fill="none" stroke="#00b4d8" stroke-width="2.5"/>
+      <line x1="330" y1="63" x2="330" y2="130" stroke="#00b4d8" stroke-width="2.5"/>
+      <line x1="330" y1="80" x2="305" y2="105" stroke="#00b4d8" stroke-width="2.5"/>
+      <line x1="330" y1="80" x2="355" y2="105" stroke="#00b4d8" stroke-width="2.5"/>
+      <line x1="330" y1="130" x2="315" y2="175" stroke="#00b4d8" stroke-width="2.5"/>
+      <line x1="330" y1="130" x2="345" y2="175" stroke="#00b4d8" stroke-width="2.5"/>
+      <!-- circle hip arrow -->
+      <ellipse cx="330" cy="130" rx="30" ry="18" fill="none" stroke="#ffd166" stroke-width="1.5" stroke-dasharray="5,3"/>
+      <polygon points="360,130 353,122 353,138" fill="#ffd166"/>
+      <text x="330" y="210" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Círculos de quadril</text>
+      <text x="330" y="222" fill="#8b949e" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">10× cada lado</text>
+
+      <!-- Figure 3: seated knee ext -->
+      <rect x="470" y="120" width="80" height="12" rx="4" fill="#1c2330" stroke="#30363d" stroke-width="1.5"/>
+      <circle cx="510" cy="50" r="18" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="510" y1="68" x2="510" y2="120" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="510" y1="85" x2="485" y2="108" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="510" y1="85" x2="535" y2="108" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="510" y1="120" x2="490" y2="155" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- leg extended -->
+      <line x1="510" y1="120" x2="555" y2="140" stroke="#ffd166" stroke-width="2.5"/>
+      <line x1="555" y1="140" x2="580" y2="138" stroke="#00e5a0" stroke-width="2.5"/>
+      <path d="M545 110 L562 128" stroke="#ffd166" stroke-width="1.5" fill="none"/>
+      <polygon points="562,128 552,126 556,137" fill="#ffd166"/>
+      <text x="510" y="210" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Extensão sentada</text>
+      <text x="510" y="222" fill="#8b949e" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">10× cada lado</text>
+    </svg>
+    <div class="illus-cap">Faça cada movimento devagar e sem dor</div>
+  </div>
+
+  <p class="howto">
+    <strong>1. Marcha parada:</strong> 2 minutos. Levante os joelhos alternadamente até a altura do quadril, postura ereta.<br>
+    <strong>2. Círculos de quadril:</strong> 10 círculos para cada lado, como se estivesse movendo um hula-hoop devagar.<br>
+    <strong>3. Extensão sentada:</strong> 10 repetições cada lado, devagar e controlado.
+  </p>
+  <div class="timer-row">
+    <div class="tdisp" id="td-0">5:00</div>
+    <button class="btn btn-a" onclick="startTimer(0,300)">▶ Iniciar</button>
+    <button class="btn btn-g" onclick="resetTimer(0,300)">↺</button>
+  </div>
+  <button class="btn btn-done" onclick="markDone(0)">✓ Aquecimento concluído</button>
+</div></div>
+```
+
+  </div>
+
+  <!-- ── MAIN ── -->
+
+  <div class="sec">🏋️ Treino Principal</div>
+
+  <!-- EX 1: Clamshell -->
+
+  <div class="ex" id="ex-1">
+    <div class="ex-head" onclick="toggle(1)">
+      <div class="ex-num">1</div>
+      <div class="ex-info">
+        <div class="ex-name">Clamshell — Ostra</div>
+        <div class="ex-muscle">Glúteo Médio · Rotadores Externos do Quadril</div>
+      </div>
+      <div class="ex-pills">
+        <div class="pill">Séries<b>3</b></div>
+        <div class="pill">Reps<b>15×</b></div>
+        <div class="pill">Desc<b>45s</b></div>
+      </div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="ex-body"><div class="ex-inner">
+
+```
+  <div class="illus">
+    <svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" style="background:#161b22">
+      <!-- ground -->
+      <line x1="20" y1="200" x2="580" y2="200" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <!-- POSITION A: closed -->
+      <text x="150" y="25" fill="#8b949e" font-size="12" font-family="DM Sans,sans-serif" text-anchor="middle" font-weight="600">Posição inicial</text>
+      <!-- body lying sideways -->
+      <ellipse cx="150" cy="100" rx="55" ry="22" fill="none" stroke="#00e5a0" stroke-width="2" stroke-dasharray="4,3"/>
+      <!-- head -->
+      <circle cx="205" cy="95" r="16" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- legs together -->
+      <path d="M100 105 Q80 140 60 175 Q75 178 90 175 Q100 150 115 125" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <path d="M105 110 Q88 145 70 178 Q85 181 98 178 Q108 152 122 128" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,3"/>
+      <!-- band -->
+      <path d="M75 160 Q95 155 115 160" fill="none" stroke="#b8a0d4" stroke-width="3"/>
+      <text x="65" y="148" fill="#b8a0d4" font-size="10" font-family="DM Sans,sans-serif">band</text>
+      <!-- feet -->
+      <ellipse cx="57" cy="176" rx="12" ry="5" fill="none" stroke="#00e5a0" stroke-width="2"/>
+      <ellipse cx="67" cy="179" rx="12" ry="5" fill="none" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,3"/>
+      <text x="150" y="218" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Pés juntos, joelhos a 90°</text>
+
+      <!-- ARROW middle -->
+      <path d="M265 110 L320 110" stroke="#ffd166" stroke-width="2" fill="none" marker-end="url(#arr)"/>
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#ffd166"/>
+        </marker>
+      </defs>
+
+      <!-- POSITION B: open -->
+      <text x="450" y="25" fill="#00e5a0" font-size="12" font-family="DM Sans,sans-serif" text-anchor="middle" font-weight="600">Abrir — 2 seg</text>
+      <ellipse cx="450" cy="100" rx="55" ry="22" fill="none" stroke="#00e5a0" stroke-width="2" stroke-dasharray="4,3"/>
+      <circle cx="505" cy="95" r="16" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- bottom leg -->
+      <path d="M400 108 Q380 143 360 175 Q375 178 390 175 Q400 150 415 126" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- top leg OPEN -->
+      <path d="M405 105 Q390 80 375 55 Q390 48 402 54 Q415 78 422 108" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- band stretched -->
+      <path d="M378 155 Q405 130 415 108" fill="none" stroke="#b8a0d4" stroke-width="3"/>
+      <!-- angle indicator -->
+      <path d="M400 110 Q385 85 375 60" fill="none" stroke="none"/>
+      <text x="340" y="72" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif">~45°</text>
+      <!-- hold indicator -->
+      <rect x="340" y="35" width="80" height="20" rx="10" fill="rgba(0,229,160,.15)" stroke="rgba(0,229,160,.4)" stroke-width="1"/>
+      <text x="380" y="49" fill="#00e5a0" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">Segure 2 seg</text>
+      <text x="450" y="218" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Quadril NÃO gira para trás!</text>
+    </svg>
+    <div class="illus-cap">Deite de lado · Abra o joelho de cima como uma concha · Segure 2 segundos no topo</div>
+  </div>
+
+  <p class="howto">
+    <strong>Miniband:</strong> logo acima dos joelhos.<br>
+    <strong>Posição:</strong> Deite de lado, joelhos dobrados a 90°, pés juntos.<br>
+    <strong>Movimento:</strong> Abra o joelho de cima como uma concha abrindo. Segure 2 segundos no topo e desça devagar.<br>
+    <strong>⚠️ Atenção:</strong> O quadril NÃO pode girar para trás — se girar, está usando as costas, não o glúteo.
+  </p>
+  <div class="tip">💡 Sinta o "queimado" na lateral do bumbum. Se não sentir, está rápido demais.</div>
+  <div class="bsel-lbl">Banda para este exercício:</div>
+  <div class="bopts" id="bo-1">
+    <button class="bopt" onclick="selBand('bo-1',this,'light')">🩷 Light</button>
+    <button class="bopt on-medium" onclick="selBand('bo-1',this,'medium')">💜 Medium ✓</button>
+    <button class="bopt" onclick="selBand('bo-1',this,'heavy')">🟣 Heavy</button>
+    <button class="bopt" onclick="selBand('bo-1',this,'xheavy')">🟤 X-Heavy</button>
+    <button class="bopt" onclick="selBand('bo-1',this,'xxheavy')">⚫ XX-Heavy</button>
+  </div>
+  <div class="sets-row">
+    <span class="sets-lbl">Séries:</span>
+    <div class="sdot" onclick="this.classList.toggle('on')">1</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">2</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">3</div>
+    <span class="sets-lbl" style="margin-left:8px">Descanso:</span>
+    <div class="tdisp" id="td-1" style="font-size:26px">0:45</div>
+    <button class="btn btn-g btn-sm" onclick="startTimer(1,45)">▶</button>
+    <button class="btn btn-g btn-sm" onclick="resetTimer(1,45)">↺</button>
+  </div>
+  <button class="btn btn-done" onclick="markDone(1)">✓ Exercício concluído</button>
+</div></div>
+```
+
+  </div>
+
+  <!-- EX 2: Caminhada Lateral -->
+
+  <div class="ex" id="ex-2">
+    <div class="ex-head" onclick="toggle(2)">
+      <div class="ex-num">2</div>
+      <div class="ex-info">
+        <div class="ex-name">Caminhada Lateral</div>
+        <div class="ex-muscle">Glúteo Médio · Abdutores · Estabilidade do Joelho</div>
+      </div>
+      <div class="ex-pills">
+        <div class="pill">Séries<b>3</b></div>
+        <div class="pill">Reps<b>12 passos</b></div>
+        <div class="pill">Desc<b>45s</b></div>
+      </div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="ex-body"><div class="ex-inner">
+
+```
+  <div class="illus">
+    <svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" style="background:#161b22">
+      <line x1="20" y1="210" x2="580" y2="210" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <!-- Figure A: start position -->
+      <text x="100" y="22" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Meio-agachamento</text>
+      <circle cx="100" cy="48" r="16" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- body angled for squat -->
+      <line x1="100" y1="64" x2="98" y2="120" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="98" y1="80" x2="72" y2="98" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="98" y1="80" x2="124" y2="98" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- legs bent -->
+      <line x1="98" y1="120" x2="80" y2="170" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="80" y1="170" x2="78" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="98" y1="120" x2="116" y2="170" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="116" y1="170" x2="118" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- band -->
+      <path d="M80 165 Q98 158 116 165" fill="none" stroke="#b8a0d4" stroke-width="3.5"/>
+      <!-- knee angle indicator -->
+      <path d="M98 120 Q88 145 80 170" fill="none" stroke="none"/>
+      <text x="52" y="148" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif">~45°</text>
+
+      <!-- arrows: step right -->
+      <path d="M200 140 L270 140" stroke="#00e5a0" stroke-width="2.5" fill="none"/>
+      <polygon points="270,140 258,134 258,146" fill="#00e5a0"/>
+      <text x="235" y="130" fill="#00e5a0" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">12 passos →</text>
+      <path d="M270 165 L200 165" stroke="#ffd166" stroke-width="2" fill="none" stroke-dasharray="5,3"/>
+      <polygon points="200,165 212,159 212,171" fill="#ffd166"/>
+      <text x="235" y="180" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">← volta</text>
+
+      <!-- Figure B: step position -->
+      <text x="450" y="22" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Passo lateral</text>
+      <circle cx="450" cy="48" r="16" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="450" y1="64" x2="448" y2="120" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="448" y1="80" x2="422" y2="98" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="448" y1="80" x2="474" y2="98" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- wider stance -->
+      <line x1="448" y1="120" x2="420" y2="168" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="420" y1="168" x2="418" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="448" y1="120" x2="490" y2="168" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="490" y1="168" x2="492" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- band stretched -->
+      <path d="M420 162 Q455 150 490 162" fill="none" stroke="#b8a0d4" stroke-width="3.5"/>
+      <!-- ✓ knees out indicator -->
+      <path d="M395 170 L410 162" stroke="#ffd166" stroke-width="1.5" fill="none"/>
+      <path d="M515 170 L500 162" stroke="#ffd166" stroke-width="1.5" fill="none"/>
+      <text x="370" y="182" fill="#ffd166" font-size="9" font-family="DM Sans,sans-serif">joelhos</text>
+      <text x="370" y="193" fill="#ffd166" font-size="9" font-family="DM Sans,sans-serif">para fora!</text>
+      <text x="450" y="228" fill="#8b949e" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">Elástico sempre tensionado</text>
+    </svg>
+    <div class="illus-cap">Meio-agachamento · 12 passos para cada lado · Joelhos não fecham!</div>
+  </div>
+
+  <p class="howto">
+    <strong>Miniband:</strong> acima dos joelhos ou nos tornozelos (mais difícil).<br>
+    <strong>Posição:</strong> Levemente agachada (meio-squat), pés na largura do quadril.<br>
+    <strong>Movimento:</strong> 12 passos para um lado, depois 12 para o outro. Não deixe os pés se juntarem.<br>
+    <strong>⚠️ Atenção:</strong> Elástico sempre tensionado. Joelhos não dobram para dentro.
+  </p>
+  <div class="tip">💡 Passos firmes e controlados — não deixe o elástico "vencer" você.</div>
+  <div class="bsel-lbl">Banda para este exercício:</div>
+  <div class="bopts" id="bo-2">
+    <button class="bopt" onclick="selBand('bo-2',this,'light')">🩷 Light</button>
+    <button class="bopt on-medium" onclick="selBand('bo-2',this,'medium')">💜 Medium ✓</button>
+    <button class="bopt" onclick="selBand('bo-2',this,'heavy')">🟣 Heavy</button>
+    <button class="bopt" onclick="selBand('bo-2',this,'xheavy')">🟤 X-Heavy</button>
+    <button class="bopt" onclick="selBand('bo-2',this,'xxheavy')">⚫ XX-Heavy</button>
+  </div>
+  <div class="sets-row">
+    <span class="sets-lbl">Séries:</span>
+    <div class="sdot" onclick="this.classList.toggle('on')">1</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">2</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">3</div>
+    <span class="sets-lbl" style="margin-left:8px">Descanso:</span>
+    <div class="tdisp" id="td-2" style="font-size:26px">0:45</div>
+    <button class="btn btn-g btn-sm" onclick="startTimer(2,45)">▶</button>
+    <button class="btn btn-g btn-sm" onclick="resetTimer(2,45)">↺</button>
+  </div>
+  <button class="btn btn-done" onclick="markDone(2)">✓ Exercício concluído</button>
+</div></div>
+```
+
+  </div>
+
+  <!-- EX 3: Glute Bridge -->
+
+  <div class="ex" id="ex-3">
+    <div class="ex-head" onclick="toggle(3)">
+      <div class="ex-num">3</div>
+      <div class="ex-info">
+        <div class="ex-name">Glute Bridge com Miniband</div>
+        <div class="ex-muscle">Glúteo Máximo · Isquiotibiais · Lombar</div>
+      </div>
+      <div class="ex-pills">
+        <div class="pill">Séries<b>3</b></div>
+        <div class="pill">Reps<b>15</b></div>
+        <div class="pill">Desc<b>45s</b></div>
+      </div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="ex-body"><div class="ex-inner">
+
+```
+  <div class="illus">
+    <svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" style="background:#161b22">
+      <line x1="20" y1="210" x2="580" y2="210" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <!-- POSITION A: down -->
+      <text x="120" y="22" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Posição inicial</text>
+      <!-- body flat -->
+      <ellipse cx="120" cy="175" rx="75" ry="14" fill="none" stroke="#00e5a0" stroke-width="2" stroke-dasharray="4,3"/>
+      <circle cx="198" cy="172" r="15" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- legs bent up -->
+      <line x1="68" y1="175" x2="82" y2="135" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="82" y1="135" x2="82" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="52" y1="175" x2="65" y2="135" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="65" y1="135" x2="65" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- band -->
+      <path d="M55 145 Q73 138 84 145" fill="none" stroke="#b8a0d4" stroke-width="3.5"/>
+      <!-- feet -->
+      <rect x="55" y="205" width="22" height="6" rx="3" fill="none" stroke="#00e5a0" stroke-width="2"/>
+
+      <!-- UP arrow -->
+      <path d="M230 150 L230 100" stroke="#ffd166" stroke-width="2.5" fill="none"/>
+      <polygon points="230,95 224,108 236,108" fill="#ffd166"/>
+      <text x="242" y="130" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif">subir</text>
+
+      <!-- POSITION B: up -->
+      <text x="440" y="22" fill="#00e5a0" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Quadril elevado — 2 seg</text>
+      <!-- body bridged: diagonal from shoulders to knees -->
+      <circle cx="530" cy="112" r="15" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- torso / thighs line -->
+      <line x1="390" y1="180" x2="510" y2="118" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- lower leg vertical -->
+      <line x1="390" y1="120" x2="390" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="370" y1="120" x2="370" y2="210" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- thigh -->
+      <line x1="390" y1="120" x2="450" y2="130" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="370" y1="120" x2="430" y2="127" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- band -->
+      <path d="M372 128 Q400 118 430 128" fill="none" stroke="#b8a0d4" stroke-width="3.5"/>
+      <!-- straight line indicator -->
+      <line x1="385" y1="180" x2="505" y2="115" stroke="#ffd166" stroke-width="1" stroke-dasharray="4,4"/>
+      <text x="430" y="168" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif">linha reta!</text>
+      <!-- feet on ground -->
+      <rect x="358" y="205" width="22" height="6" rx="3" fill="none" stroke="#00e5a0" stroke-width="2"/>
+      <!-- glute squeeze icon -->
+      <text x="475" y="145" fill="#00e5a0" font-size="18" font-family="DM Sans,sans-serif">💪</text>
+      <text x="440" y="228" fill="#8b949e" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">Aperte o bumbum no topo!</text>
+    </svg>
+    <div class="illus-cap">Suba o quadril · Forme linha reta · Segure 2 seg · Desça em 4 seg</div>
+  </div>
+
+  <p class="howto">
+    <strong>Miniband:</strong> logo acima dos joelhos.<br>
+    <strong>Posição:</strong> Deite de costas, joelhos dobrados, pés no chão na largura do quadril.<br>
+    <strong>Movimento:</strong> Empurre os joelhos para fora (contra o elástico). Suba o quadril formando linha reta. Segure 2 seg. Desça em 4 seg.<br>
+    <strong>⚠️ Atenção:</strong> Não deixe os joelhos caírem para dentro.
+  </p>
+  <div class="tip">💡 Aperte bem o bumbum no topo — imagine segurando uma moeda entre as nádegas!</div>
+  <div class="bsel-lbl">Banda para este exercício:</div>
+  <div class="bopts" id="bo-3">
+    <button class="bopt" onclick="selBand('bo-3',this,'light')">🩷 Light</button>
+    <button class="bopt on-medium" onclick="selBand('bo-3',this,'medium')">💜 Medium ✓</button>
+    <button class="bopt" onclick="selBand('bo-3',this,'heavy')">🟣 Heavy</button>
+    <button class="bopt" onclick="selBand('bo-3',this,'xheavy')">🟤 X-Heavy</button>
+    <button class="bopt" onclick="selBand('bo-3',this,'xxheavy')">⚫ XX-Heavy</button>
+  </div>
+  <div class="sets-row">
+    <span class="sets-lbl">Séries:</span>
+    <div class="sdot" onclick="this.classList.toggle('on')">1</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">2</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">3</div>
+    <span class="sets-lbl" style="margin-left:8px">Descanso:</span>
+    <div class="tdisp" id="td-3" style="font-size:26px">0:45</div>
+    <button class="btn btn-g btn-sm" onclick="startTimer(3,45)">▶</button>
+    <button class="btn btn-g btn-sm" onclick="resetTimer(3,45)">↺</button>
+  </div>
+  <button class="btn btn-done" onclick="markDone(3)">✓ Exercício concluído</button>
+</div></div>
+```
+
+  </div>
+
+  <!-- EX 4: TKE -->
+
+  <div class="ex" id="ex-4">
+    <div class="ex-head" onclick="toggle(4)">
+      <div class="ex-num">4</div>
+      <div class="ex-info">
+        <div class="ex-name">TKE — Extensão Terminal do Joelho</div>
+        <div class="ex-muscle">Quadríceps VMO · Estabilização Patelar ⭐</div>
+      </div>
+      <div class="ex-pills">
+        <div class="pill">Séries<b>3</b></div>
+        <div class="pill">Reps<b>15×</b></div>
+        <div class="pill">Desc<b>30s</b></div>
+      </div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="ex-body"><div class="ex-inner">
+
+```
+  <div class="illus">
+    <svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" style="background:#161b22">
+      <line x1="20" y1="215" x2="580" y2="215" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <!-- anchor point (door/bed) -->
+      <rect x="20" y="80" width="18" height="80" rx="4" fill="#30363d"/>
+      <text x="10" y="75" fill="#8b949e" font-size="9" font-family="DM Sans,sans-serif">porta /</text>
+      <text x="10" y="86" fill="#8b949e" font-size="9" font-family="DM Sans,sans-serif">cama</text>
+
+      <!-- POSITION A: knee bent -->
+      <text x="180" y="22" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Joelho levemente dobrado</text>
+      <circle cx="180" cy="48" r="16" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="180" y1="64" x2="180" y2="130" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="180" y1="82" x2="155" y2="108" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="180" y1="82" x2="205" y2="108" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- front leg: slightly bent -->
+      <line x1="180" y1="130" x2="168" y2="180" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="168" y1="180" x2="170" y2="215" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- back leg -->
+      <line x1="180" y1="130" x2="190" y2="178" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,3"/>
+      <line x1="190" y1="178" x2="192" y2="215" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,3"/>
+      <!-- band from door to back of knee -->
+      <path d="M38 140 Q100 145 168 178" fill="none" stroke="#ff6b35" stroke-width="3"/>
+      <text x="60" y="135" fill="#ff6b35" font-size="10" font-family="DM Sans,sans-serif">elástico</text>
+      <!-- band position label -->
+      <text x="140" y="195" fill="#ff6b35" font-size="9" font-family="DM Sans,sans-serif">atrás</text>
+      <text x="140" y="205" fill="#ff6b35" font-size="9" font-family="DM Sans,sans-serif">do joelho</text>
+
+      <!-- arrow extend -->
+      <path d="M295 140 L360 140" stroke="#ffd166" stroke-width="2.5" fill="none"/>
+      <polygon points="360,140 348,134 348,146" fill="#ffd166"/>
+      <text x="325" y="130" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">estender</text>
+
+      <!-- POSITION B: knee straight -->
+      <text x="480" y="22" fill="#00e5a0" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">Estendido — 2 seg</text>
+      <circle cx="480" cy="48" r="16" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="480" y1="64" x2="480" y2="130" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="480" y1="82" x2="455" y2="108" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="480" y1="82" x2="505" y2="108" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- straight leg -->
+      <line x1="480" y1="130" x2="468" y2="215" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- back leg -->
+      <line x1="480" y1="130" x2="492" y2="215" stroke="#8b949e" stroke-width="2" stroke-dasharray="4,3"/>
+      <!-- band -->
+      <path d="M38 145 Q240 150 468 210" fill="none" stroke="#ff6b35" stroke-width="3"/>
+      <!-- VMO highlight -->
+      <ellipse cx="468" cy="195" rx="12" ry="18" fill="rgba(255,107,53,.2)" stroke="#ff6b35" stroke-width="1.5"/>
+      <text x="435" y="185" fill="#ff6b35" font-size="9" font-family="DM Sans,sans-serif">VMO</text>
+      <text x="435" y="196" fill="#ff6b35" font-size="9" font-family="DM Sans,sans-serif">ativado!</text>
+      <rect x="420" y="35" width="110" height="20" rx="10" fill="rgba(0,229,160,.12)" stroke="rgba(0,229,160,.35)" stroke-width="1"/>
+      <text x="475" y="49" fill="#00e5a0" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">Movimento pequeno!</text>
+    </svg>
+    <div class="illus-cap">Elástico na parte de trás do joelho · Estenda contra a resistência · VMO é o foco!</div>
+  </div>
+
+  <p class="howto">
+    <strong>Setup:</strong> Prenda o elástico em algo fixo (pé de cama, maçaneta) na altura do joelho. Coloque na parte de <em>trás</em> do joelho.<br>
+    <strong>Posição:</strong> De frente para o ponto fixo, joelho levemente dobrado.<br>
+    <strong>Movimento:</strong> Estenda o joelho completamente contra a resistência. Segure 2 seg. Retorne devagar. Movimento pequeno e preciso!<br>
+    <strong>⚠️ Atenção:</strong> Não hiperestenda. Sem dor!
+  </p>
+  <div class="tip">💡 Este exercício ativa o VMO — o músculo em "gota" que estabiliza a patela. É o favorito dos fisioterapeutas para dor no joelho!</div>
+  <div class="bsel-lbl">Banda para este exercício:</div>
+  <div class="bopts" id="bo-4">
+    <button class="bopt on-light" onclick="selBand('bo-4',this,'light')">🩷 Light ✓</button>
+    <button class="bopt" onclick="selBand('bo-4',this,'medium')">💜 Medium</button>
+    <button class="bopt" onclick="selBand('bo-4',this,'heavy')">🟣 Heavy</button>
+    <button class="bopt" onclick="selBand('bo-4',this,'xheavy')">🟤 X-Heavy</button>
+    <button class="bopt" onclick="selBand('bo-4',this,'xxheavy')">⚫ XX-Heavy</button>
+  </div>
+  <div class="sets-row">
+    <span class="sets-lbl">Séries:</span>
+    <div class="sdot" onclick="this.classList.toggle('on')">1</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">2</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">3</div>
+    <span class="sets-lbl" style="margin-left:8px">Descanso:</span>
+    <div class="tdisp" id="td-4" style="font-size:26px">0:30</div>
+    <button class="btn btn-g btn-sm" onclick="startTimer(4,30)">▶</button>
+    <button class="btn btn-g btn-sm" onclick="resetTimer(4,30)">↺</button>
+  </div>
+  <button class="btn btn-done" onclick="markDone(4)">✓ Exercício concluído</button>
+</div></div>
+```
+
+  </div>
+
+  <!-- EX 5: Isometric Squat -->
+
+  <div class="ex" id="ex-5">
+    <div class="ex-head" onclick="toggle(5)">
+      <div class="ex-num">5</div>
+      <div class="ex-info">
+        <div class="ex-name">Agachamento Isométrico + Abdução</div>
+        <div class="ex-muscle">Quadríceps · Glúteo Médio · Estabilidade Global</div>
+      </div>
+      <div class="ex-pills">
+        <div class="pill">Séries<b>3</b></div>
+        <div class="pill">Tempo<b>30s</b></div>
+        <div class="pill">Desc<b>60s</b></div>
+      </div>
+      <div class="chev">▾</div>
+    </div>
+    <div class="ex-body"><div class="ex-inner">
+
+```
+  <div class="illus">
+    <svg viewBox="0 0 600 240" xmlns="http://www.w3.org/2000/svg" style="background:#161b22">
+      <line x1="20" y1="215" x2="580" y2="215" stroke="#30363d" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <!-- Figure center -->
+      <circle cx="300" cy="45" r="18" fill="none" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- torso -->
+      <line x1="300" y1="63" x2="298" y2="130" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- arms out for balance -->
+      <line x1="298" y1="85" x2="260" y2="110" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="298" y1="85" x2="340" y2="110" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- legs bent: squat position -->
+      <line x1="298" y1="130" x2="268" y2="180" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="268" y1="180" x2="262" y2="215" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="298" y1="130" x2="330" y2="180" stroke="#00e5a0" stroke-width="2.5"/>
+      <line x1="330" y1="180" x2="336" y2="215" stroke="#00e5a0" stroke-width="2.5"/>
+      <!-- band -->
+      <path d="M264 172 Q298 160 332 172" fill="none" stroke="#b8a0d4" stroke-width="4"/>
+      <!-- outward arrows on knees -->
+      <path d="M240 178 L256 170" stroke="#ffd166" stroke-width="2.5" fill="none"/>
+      <polygon points="256,170 245,170 248,179" fill="#ffd166"/>
+      <path d="M360 178 L344 170" stroke="#ffd166" stroke-width="2.5" fill="none"/>
+      <polygon points="344,170 355,170 352,179" fill="#ffd166"/>
+      <text x="208" y="188" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif">← empurre</text>
+      <text x="363" y="188" fill="#ffd166" font-size="10" font-family="DM Sans,sans-serif">empurre →</text>
+
+      <!-- depth options -->
+      <line x1="140" y1="130" x2="220" y2="130" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="130" y="128" fill="#8b949e" font-size="9" font-family="DM Sans,sans-serif" text-anchor="end">nível</text>
+      <text x="130" y="139" fill="#8b949e" font-size="9" font-family="DM Sans,sans-serif" text-anchor="end">inicial</text>
+      <line x1="140" y1="155" x2="220" y2="155" stroke="#30363d" stroke-width="1" stroke-dasharray="4,3"/>
+      <text x="130" y="152" fill="#8b949e" font-size="9" font-family="DM Sans,sans-serif" text-anchor="end">+ fundo</text>
+      <text x="130" y="163" fill="#8b949e" font-size="9" font-family="DM Sans,sans-serif" text-anchor="end">c/ tempo</text>
+
+      <!-- timer circle -->
+      <circle cx="490" cy="120" r="55" fill="none" stroke="#30363d" stroke-width="8"/>
+      <circle cx="490" cy="120" r="55" fill="none" stroke="#00e5a0" stroke-width="8" stroke-dasharray="173 173" stroke-linecap="round" transform="rotate(-90 490 120)" opacity=".4"/>
+      <text x="490" y="112" fill="#00e5a0" font-family="Bebas Neue,sans-serif" font-size="28" text-anchor="middle">30s</text>
+      <text x="490" y="132" fill="#8b949e" font-size="11" font-family="DM Sans,sans-serif" text-anchor="middle">segure!</text>
+      <text x="300" y="232" fill="#8b949e" font-size="10" font-family="DM Sans,sans-serif" text-anchor="middle">Respire normalmente durante o isométrico</text>
+    </svg>
+    <div class="illus-cap">Desça sem dor · Empurre joelhos para fora · Segure 30 segundos</div>
+  </div>
+
+  <p class="howto">
+    <strong>Miniband:</strong> logo acima dos joelhos.<br>
+    <strong>Posição:</strong> Pés na largura dos ombros. Desça até onde conseguir SEM dor (pode ser só 30-45° no começo).<br>
+    <strong>Movimento:</strong> Segure a posição por 30 segundos. Empurre os joelhos para fora contra o elástico o tempo todo.<br>
+    <strong>⚠️ Atenção:</strong> Se o joelho doer, suba um pouco. Vá descendo mais a cada semana.
+  </p>
+  <div class="tip">💡 Respire normalmente — prender a respiração aumenta a pressão no joelho!</div>
+  <div class="bsel-lbl">Banda para este exercício:</div>
+  <div class="bopts" id="bo-5">
+    <button class="bopt" onclick="selBand('bo-5',this,'light')">🩷 Light</button>
+    <button class="bopt on-medium" onclick="selBand('bo-5',this,'medium')">💜 Medium ✓</button>
+    <button class="bopt" onclick="selBand('bo-5',this,'heavy')">🟣 Heavy</button>
+    <button class="bopt" onclick="selBand('bo-5',this,'xheavy')">🟤 X-Heavy</button>
+    <button class="bopt" onclick="selBand('bo-5',this,'xxheavy')">⚫ XX-Heavy</button>
+  </div>
+  <div class="sets-row">
+    <span class="sets-lbl">Séries:</span>
+    <div class="sdot" onclick="this.classList.toggle('on')">1</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">2</div>
+    <div class="sdot" onclick="this.classList.toggle('on')">3</div>
+  </div>
+  <div class="timer-row">
+    <div class="tdisp" id="td-5">0:30</div>
+    <button class="btn btn-a" onclick="startTimer(5,30)">▶ Iniciar</button>
+    <button class="btn btn-g" onclick="resetTimer(5,30)">↺</button>
+  </div>
+  <button class="btn btn-done" onclick="markDone(5)">✓ Exercício concluído</button>
+</div></div>
+```
+
+  </div>
+
+  <!-- Finish -->
+
+  <div class="finish">
+    <div class="finish-h">❄️ Desaquecimento</div>
+    <p style="color:var(--muted);font-size:12px;margin-bottom:14px">Parabéns! Relaxe os músculos.</p>
+    <ul class="cooldown">
+      <li>Alongamento de isquiotibial deitada — 30 seg cada lado</li>
+      <li>Alongamento de glúteo (posição de "4") — 30 seg cada lado</li>
+      <li>Rolar garrafa/bolinha sob o pé — 1 min</li>
+      <li>🧊 Gelo no joelho por 15 minutos</li>
+    </ul>
+    <div id="completeMsg">
+      <div class="complete-title">TREINO COMPLETO! 🎉</div>
+      <p style="color:var(--muted);font-size:12px;margin:6px 0 14px">Excelente! Coloca o gelo e descansa.</p>
+      <button class="btn btn-a" onclick="logToday()">📅 Registrar no Calendário</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PAGE: CALENDÁRIO ══════════════ -->
+
+<div id="pg-calendario" class="page">
+  <div style="padding-top:8px">
+    <div class="lbl">Progresso · Registro Diário</div>
+    <h1 class="h1">MEU<br><em>CALENDÁRIO</em></h1>
+    <p class="sub">Registre cada treino, anote sua dor e acompanhe a evolução.</p>
+  </div>
+  <div class="cal-top">
+    <button class="cal-nav" onclick="shiftMonth(-1)">‹</button>
+    <div class="cal-month-lbl" id="calLabel"></div>
+    <button class="cal-nav" onclick="shiftMonth(1)">›</button>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="sgrid">
+    <div class="sc"><div class="sc-icon">🏋️</div><div class="sc-lbl">Treinos no mês</div><div class="sc-val" id="stTreinos">0</div></div>
+    <div class="sc"><div class="sc-icon">📊</div><div class="sc-lbl">Dor média</div><div class="sc-val" id="stDor">—</div></div>
+    <div class="sc"><div class="sc-icon">🔥</div><div class="sc-lbl">Sequência</div><div class="sc-val" id="stStreak">0 dias</div></div>
+    <div class="sc"><div class="sc-icon">📅</div><div class="sc-lbl">Último treino</div><div class="sc-val" id="stLast">—</div></div>
+  </div>
+  <div class="sec">Histórico</div>
+  <div id="logList" style="font-size:12px;color:var(--muted)">Nenhum registro ainda. Toque num dia para começar!</div>
+</div>
+
+<!-- ══════════════ PAGE: PROGRESSÃO ══════════════ -->
+
+<div id="pg-progressao" class="page">
+  <div style="padding-top:8px">
+    <div class="lbl">Fokky Bands · Plano de Progressão</div>
+    <h1 class="h1">EVOLUÇÃO<br><em>DA BANDA</em></h1>
+    <p class="sub">Guia de 8 semanas para aumentar a resistência com segurança.</p>
+  </div>
+  <div class="sec">Critério para avançar de banda</div>
+  <div class="pnote">✅ <strong>Avance quando:</strong> completar todas as 3 séries com técnica correta, dor ≤ 3/10, e a banda parecer "fácil" por 2 treinos seguidos.<br><br>⏸️ <strong>Fique na mesma se:</strong> dor acima de 4/10 durante ou após, ou a técnica estiver comprometida.</div>
+  <div class="sec">Tabela de progressão — 8 semanas</div>
+  <div style="overflow-x:auto">
+  <table class="ptable">
+    <thead>
+      <tr><th>Semana</th><th>Clamshell</th><th>Caminhada</th><th>Glute Bridge</th><th>TKE</th><th>Agach. Iso.</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="wk">1–2</span></td><td><span class="bt bt-l">🩷 Light</span></td><td><span class="bt bt-l">🩷 Light</span></td><td><span class="bt bt-l">🩷 Light</span></td><td><span class="bt bt-l">🩷 Light</span></td><td><span class="bt bt-l">🩷 Light</span></td></tr>
+      <tr><td><span class="wk">3–4</span></td><td><span class="bt bt-m">💜 Medium</span></td><td><span class="bt bt-m">💜 Medium</span></td><td><span class="bt bt-m">💜 Medium</span></td><td><span class="bt bt-l">🩷 Light</span></td><td><span class="bt bt-m">💜 Medium</span></td></tr>
+      <tr><td><span class="wk">5–6</span></td><td><span class="bt bt-h">🟣 Heavy</span></td><td><span class="bt bt-m">💜 Medium</span></td><td><span class="bt bt-h">🟣 Heavy</span></td><td><span class="bt bt-m">💜 Medium</span></td><td><span class="bt bt-h">🟣 Heavy</span></td></tr>
+      <tr><td><span class="wk">7–8</span></td><td><span class="bt bt-x">🟤 X-Heavy</span></td><td><span class="bt bt-h">🟣 Heavy</span></td><td><span class="bt bt-x">🟤 X-Heavy</span></td><td><span class="bt bt-m">💜 Medium</span></td><td><span class="bt bt-x">🟤 X-Heavy</span></td></tr>
+      <tr><td><span class="wk">9+</span></td><td><span class="bt bt-xx">⚫ XX-Heavy</span></td><td><span class="bt bt-x">🟤 X-Heavy</span></td><td><span class="bt bt-xx">⚫ XX-Heavy</span></td><td><span class="bt bt-h">🟣 Heavy</span></td><td><span class="bt bt-xx">⚫ XX-Heavy</span></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="sec">Notas por exercício</div>
+  <div class="pnote" style="margin-bottom:10px"><strong>TKE:</strong> Progride mais devagar pois o VMO é um músculo pequeno e a técnica é prioritária. NÃO avance se sentir dor patelofemoral.</div>
+  <div class="pnote" style="margin-bottom:10px"><strong>Caminhada Lateral:</strong> Pode progredir também pela posição da banda — joelhos → tornozelos — aumentando a dificuldade sem trocar de banda.</div>
+  <div class="pnote"><strong>Lembre-se:</strong> Com consistência de 3× por semana, em 4–6 semanas você deve notar diferença clara na estabilidade do joelho!</div>
+</div>
+
+<!-- MODAL -->
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h3 id="mTitle">Dia</h3>
+    <div class="mrow">
+      <div class="mlbl">Treinou hoje?</div>
+      <div class="yn">
+        <button class="ynb" id="mYes" onclick="setTrained(true)">✓ Sim</button>
+        <button class="ynb" id="mNo" onclick="setTrained(false)">✗ Não</button>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mlbl">Nível de dor</div>
+      <div class="mpn" id="mpn">
+        <button class="mpb" onclick="setPain(this,0)">0</button><button class="mpb" onclick="setPain(this,1)">1</button><button class="mpb" onclick="setPain(this,2)">2</button><button class="mpb" onclick="setPain(this,3)">3</button><button class="mpb" onclick="setPain(this,4)">4</button><button class="mpb" onclick="setPain(this,5)">5</button><button class="mpb" onclick="setPain(this,6)">6</button><button class="mpb" onclick="setPain(this,7)">7</button><button class="mpb" onclick="setPain(this,8)">8</button><button class="mpb" onclick="setPain(this,9)">9</button><button class="mpb" onclick="setPain(this,10)">10</button>
+      </div>
+    </div>
+    <div class="mrow">
+      <div class="mlbl">Nota</div>
+      <textarea class="mnote" id="mnote" rows="2" placeholder="Ex: senti mais estabilidade hoje..."></textarea>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-done" style="flex:1" onclick="saveDay()">💾 Salvar</button>
+      <button class="btn btn-g" onclick="deleteDay()">🗑</button>
+      <button class="btn btn-g" onclick="closeModal()">✕</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+//  STATE — all in one object, no fragile globals
+// ═══════════════════════════════════════════════════
+const S = {
+  completed: new Set(),
+  total: 6,
+  timers: {},
+  openCard: null,
+  calYear: new Date().getFullYear(),
+  calMonth: new Date().getMonth(),
+  modal: { day: null, trained: null, pain: null }
+};
+
+// ═══════════════════════════════════════════════════
+//  DATA — safe localStorage wrapper
+// ═══════════════════════════════════════════════════
+function getData() {
+  try { return JSON.parse(localStorage.getItem('joelho_v3') || '{}'); }
+  catch { return {}; }
+}
+function saveData(d) {
+  try { localStorage.setItem('joelho_v3', JSON.stringify(d)); }
+  catch { console.warn('storage unavailable'); }
+}
+
+// ═══════════════════════════════════════════════════
+//  NAVIGATION — no event dependency
+// ═══════════════════════════════════════════════════
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  btn.classList.add('on');
+  if (id === 'calendario') renderCal();
+}
+
+// ═══════════════════════════════════════════════════
+//  PAIN SCALE (treino page)
+// ═══════════════════════════════════════════════════
+function selPain(btn) {
+  document.querySelectorAll('.pn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  const v = parseInt(btn.dataset.v);
+  document.getElementById('painAlert').classList.toggle('on', v >= 7);
+}
+
+// ═══════════════════════════════════════════════════
+//  BAND SELECTOR — isolated by container id
+// ═══════════════════════════════════════════════════
+function selBand(containerId, btn, band) {
+  const container = document.getElementById(containerId);
+  container.querySelectorAll('.bopt').forEach(b => {
+    b.className = 'bopt';
+    b.textContent = b.textContent.replace(' ✓', '');
+  });
+  btn.classList.add('on-' + band);
+  if (!btn.textContent.includes('✓')) btn.textContent += ' ✓';
+}
+
+// ═══════════════════════════════════════════════════
+//  CARD TOGGLE — no event dependency
+// ═══════════════════════════════════════════════════
+function toggle(id) {
+  const card = document.getElementById('ex-' + id);
+  const isOpen = card.classList.contains('open');
+  // close all
+  document.querySelectorAll('.ex').forEach(c => c.classList.remove('open'));
+  S.openCard = null;
+  if (!isOpen) {
+    card.classList.add('open');
+    S.openCard = id;
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  TIMER — isolated per id
+// ═══════════════════════════════════════════════════
+function fmt(s) {
+  return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + (s % 60);
+}
+
+function startTimer(id, dur) {
+  if (S.timers[id]) clearInterval(S.timers[id]);
+  const el = document.getElementById('td-' + id);
+  if (!el) return;
+  let rem = dur;
+  el.classList.add('run');
+  S.timers[id] = setInterval(() => {
+    rem--;
+    el.textContent = fmt(rem);
+    if (rem <= 0) {
+      clearInterval(S.timers[id]);
+      delete S.timers[id];
+      el.classList.remove('run');
+      el.textContent = '✓';
+      beep();
+    }
+  }, 1000);
+}
+
+function resetTimer(id, dur) {
+  if (S.timers[id]) { clearInterval(S.timers[id]); delete S.timers[id]; }
+  const el = document.getElementById('td-' + id);
+  if (!el) return;
+  el.classList.remove('run');
+  el.textContent = fmt(dur);
+}
+
+function beep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 880;
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    o.start(); o.stop(ctx.currentTime + 0.5);
+  } catch (e) {}
+}
+
+// ═══════════════════════════════════════════════════
+//  MARK DONE — safe, no event dependency
+// ═══════════════════════════════════════════════════
+function markDone(id) {
+  S.completed.add(id);
+  const card = document.getElementById('ex-' + id);
+  if (card) {
+    card.classList.add('done');
+    card.classList.remove('open');
+  }
+  S.openCard = null;
+
+  // stop any running timer for this card
+  if (S.timers[id]) { clearInterval(S.timers[id]); delete S.timers[id]; }
+
+  // update progress bar
+  const pct = Math.round((S.completed.size / S.total) * 100);
+  const bar = document.getElementById('pBar');
+  const pctEl = document.getElementById('pPct');
+  const cntEl = document.getElementById('pCount');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = pct + '%';
+  if (cntEl) cntEl.textContent = S.completed.size + '/' + S.total;
+
+  // show completion
+  if (S.completed.size === S.total) {
+    const msg = document.getElementById('completeMsg');
+    if (msg) msg.style.display = 'block';
+    confetti();
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  AUTO LOG from treino page
+// ═══════════════════════════════════════════════════
+function logToday() {
+  const n = new Date();
+  const key = n.getFullYear() + '-' + (n.getMonth() + 1) + '-' + n.getDate();
+  const d = getData();
+  const painBtn = document.querySelector('.pn.on');
+  d[key] = {
+    trained: true,
+    pain: painBtn ? parseInt(painBtn.dataset.v) : null,
+    note: 'Treino completo ✓'
+  };
+  saveData(d);
+  alert('✅ Treino registrado no calendário!');
+}
+
+// ═══════════════════════════════════════════════════
+//  CALENDAR
+// ═══════════════════════════════════════════════════
+const MONTHS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MO = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const DOW = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+
+function shiftMonth(d) {
+  S.calMonth += d;
+  if (S.calMonth < 0) { S.calMonth = 11; S.calYear--; }
+  if (S.calMonth > 11) { S.calMonth = 0; S.calYear++; }
+  renderCal();
+}
+
+function renderCal() {
+  const label = document.getElementById('calLabel');
+  const grid = document.getElementById('calGrid');
+  if (!label || !grid) return;
+
+  label.textContent = MONTHS[S.calMonth] + ' ' + S.calYear;
+  grid.innerHTML = '';
+
+  // day-of-week headers
+  DOW.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cdow';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  const firstDay = new Date(S.calYear, S.calMonth, 1).getDay();
+  const daysInMonth = new Date(S.calYear, S.calMonth + 1, 0).getDate();
+  const data = getData();
+  const today = new Date();
+
+  // empty cells
+  for (let i = 0; i < firstDay; i++) {
+    const el = document.createElement('div');
+    el.className = 'cday empty';
+    grid.appendChild(el);
+  }
+
+  // day cells
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = S.calYear + '-' + (S.calMonth + 1) + '-' + d;
+    const rec = data[key];
+    const isToday = today.getDate() === d && today.getMonth() === S.calMonth && today.getFullYear() === S.calYear;
+
+    const el = document.createElement('div');
+    el.className = 'cday';
+    if (isToday) el.classList.add('today');
+    if (rec && rec.trained) el.classList.add('trained');
+    if (rec && rec.pain != null && rec.pain >= 7) el.classList.add('pain-hi');
+
+    let inner = '<span>' + d + '</span>';
+    if (rec && rec.pain != null) {
+      const color = rec.pain >= 7 ? '#ff6b35' : rec.pain >= 4 ? '#ffd166' : '#00e5a0';
+      inner += '<div class="cdot" style="background:' + color + '"></div>';
+    }
+    el.innerHTML = inner;
+
+    // capture d for closure
+    (function(day) {
+      el.onclick = function() { openModal(day); };
+    })(d);
+
+    grid.appendChild(el);
+  }
+
+  updateStats(data);
+  renderLog(data);
+}
+
+function updateStats(data) {
+  const keys = Object.keys(data).filter(k => {
+    const parts = k.split('-');
+    return parseInt(parts[0]) === S.calYear && parseInt(parts[1]) === S.calMonth + 1;
+  });
+  const trained = keys.filter(k => data[k] && data[k].trained);
+  const pains = keys.filter(k => data[k] && data[k].pain != null).map(k => data[k].pain);
+
+  const el = id => document.getElementById(id);
+  if (el('stTreinos')) el('stTreinos').textContent = trained.length;
+  if (el('stDor')) el('stDor').textContent = pains.length ? (pains.reduce((a,b)=>a+b,0)/pains.length).toFixed(1)+'/10' : '—';
+
+  // streak
+  let streak = 0, cur = new Date();
+  for (let i = 0; i < 365; i++) {
+    const k = cur.getFullYear()+'-'+(cur.getMonth()+1)+'-'+cur.getDate();
+    if (data[k] && data[k].trained) { streak++; cur.setDate(cur.getDate()-1); }
+    else break;
+  }
+  if (el('stStreak')) el('stStreak').textContent = streak + ' dias';
+
+  // last trained
+  const allTrained = Object.keys(data).filter(k => data[k] && data[k].trained).sort().reverse();
+  if (el('stLast') && allTrained.length) {
+    const p = allTrained[0].split('-');
+    el('stLast').textContent = p[2] + ' ' + MO[parseInt(p[1])-1];
+  } else if (el('stLast')) {
+    el('stLast').textContent = '—';
+  }
+}
+
+function renderLog(data) {
+  const el = document.getElementById('logList');
+  if (!el) return;
+  const entries = Object.keys(data).sort().reverse().slice(0, 15);
+  if (!entries.length) { el.textContent = 'Nenhum registro ainda. Toque num dia para começar!'; return; }
+  el.innerHTML = '';
+  entries.forEach(k => {
+    const p = k.split('-');
+    const rec = data[k];
+    const row = document.createElement('div');
+    row.className = 'log-item';
+    const color = rec.pain != null ? (rec.pain>=7?'#ff6b35':rec.pain>=4?'#ffd166':'#00e5a0') : '#8b949e';
+    row.innerHTML =
+      '<span class="log-date">' + p[2] + ' ' + MO[parseInt(p[1])-1] + '</span>' +
+      '<span style="font-size:18px">' + (rec.trained ? '🏋️' : '💤') + '</span>' +
+      (rec.pain != null ? '<span class="log-pain">Dor: <strong style="color:'+color+'">'+rec.pain+'/10</strong></span>' : '') +
+      (rec.note ? '<span class="log-note">' + rec.note + '</span>' : '');
+    el.appendChild(row);
+  });
+}
+
+// ═══════════════════════════════════════════════════
+//  MODAL
+// ═══════════════════════════════════════════════════
+function openModal(day) {
+  S.modal.day = day;
+  const key = S.calYear + '-' + (S.calMonth + 1) + '-' + day;
+  const rec = getData()[key] || {};
+  S.modal.trained = rec.trained !== undefined ? rec.trained : null;
+  S.modal.pain = rec.pain != null ? rec.pain : null;
+
+  document.getElementById('mTitle').textContent = day + ' de ' + MO[S.calMonth] + ' ' + S.calYear;
+  document.getElementById('mnote').value = rec.note || '';
+  document.getElementById('mYes').className = 'ynb' + (rec.trained ? ' yes' : '');
+  document.getElementById('mNo').className = 'ynb' + (rec.trained === false ? ' no' : '');
+  document.querySelectorAll('.mpb').forEach((b, i) => {
+    b.classList.toggle('on', i === rec.pain);
+  });
+  document.getElementById('overlay').classList.add('on');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('on');
+}
+
+function setTrained(v) {
+  S.modal.trained = v;
+  document.getElementById('mYes').className = 'ynb' + (v ? ' yes' : '');
+  document.getElementById('mNo').className = 'ynb' + (!v ? ' no' : '');
+}
+
+function setPain(btn, v) {
+  S.modal.pain = v;
+  document.querySelectorAll('.mpb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+}
+
+function saveDay() {
+  if (S.modal.day === null) return;
+  const key = S.calYear + '-' + (S.calMonth + 1) + '-' + S.modal.day;
+  const d = getData();
+  d[key] = { trained: S.modal.trained, pain: S.modal.pain, note: document.getElementById('mnote').value };
+  saveData(d);
+  closeModal();
+  renderCal();
+}
+
+function deleteDay() {
+  if (S.modal.day === null) return;
+  const key = S.calYear + '-' + (S.calMonth + 1) + '-' + S.modal.day;
+  const d = getData();
+  delete d[key];
+  saveData(d);
+  closeModal();
+  renderCal();
+}
+
+// close modal clicking outside
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ═══════════════════════════════════════════════════
+//  CONFETTI
+// ═══════════════════════════════════════════════════
+function confetti() {
+  const colors = ['#00e5a0','#00b4d8','#ff6b35','#ffd166','#fff'];
+  for (let i = 0; i < 55; i++) {
+    setTimeout(() => {
+      const dot = document.createElement('div');
+      dot.className = 'cdot-fx';
+      dot.style.left = Math.random() * 100 + 'vw';
+      dot.style.top = '-10px';
+      dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+      dot.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+      document.body.appendChild(dot);
+      setTimeout(() => dot.remove(), 3000);
+    }, i * 40);
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════
+// Open first exercise on load
+toggle(1);
+</script>
+
+</body>
+</html>
